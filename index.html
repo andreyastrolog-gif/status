@@ -208,7 +208,7 @@
     }else if(t.description){
       h+='<p>'+esc(t.description)+'</p>';
     }
-    if(st!=='waiting_user'){
+    if(st!=='waiting_user'&&!(st==='queued'&&typeof t.progress!=='number')){
       var pct=taskPercent(t,new Date());
       h+='<div class="prog"><div class="bar"><span data-bar style="width:'+pct+'%"></span></div><span class="p" data-pct>'+pct+'%</span></div>';
     }
