@@ -1,7 +1,7 @@
 {
-  "updated": "2026-09-25T17:40:42+04:00",
+  "updated": "2026-09-25T17:40:54+04:00",
   "tasks": [
-    {"id": "status-page", "title": "Страница статуса задач", "description": "Живая страница, где видно, что сейчас в работе, что в очереди и что ждёт вашего ответа.", "status": "running", "progress": null, "started": "2026-09-25T17:36:00+04:00", "eta": "2026-09-25T17:55:00+04:00", "finished": null, "link": null},
+    {"id": "status-page", "title": "Страница статуса задач", "description": "Живая страница, где видно, что сейчас в работе, что в очереди и что ждёт вашего ответа.", "status": "running", "progress": 42, "started": "2026-09-25T17:36:00+04:00", "eta": "2026-09-25T17:55:00+04:00", "finished": null, "link": null},
     {"id": "form-tg", "title": "Форма заявок Google + уведомления в Telegram", "description": "Начну после того, как вы нажмёте /start в боте и войдёте в Google-аккаунт.", "status": "queued", "progress": null, "started": null, "eta": null, "finished": null, "link": null},
     {"id": "social-accounts", "title": "Регистрация аккаунтов Instagram, TikTok, Facebook, YouTube, Telegram-канала", "description": "Создание и оформление профилей по подготовленным текстам и картинкам.", "status": "queued", "progress": null, "started": null, "eta": null, "finished": null, "link": null},
     {"id": "site-archive", "title": "Архив сайта для вашего хостинга и домена", "description": "Готовый архив сайта, который можно загрузить на любой хостинг и подключить свой домен.", "status": "queued", "progress": null, "started": null, "eta": null, "finished": null, "link": null},
