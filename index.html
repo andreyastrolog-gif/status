@@ -124,7 +124,8 @@
   var STAT_LABELS={running:'выполняется',queued:'в очереди',waiting_user:'ждёт вашего ответа',done:'готово'};
   var COLORS={running:'var(--run)',queued:'var(--queue)',waiting_user:'var(--wait)',done:'var(--done)'};
 
-  var data=null, lastRaw='', nextAt=0, apiBlockedUntil=0, loading=false;
+  var data=null, lastRaw='', nextAt=0, loading=false;
+  var apiBlockedUntil=0; try{apiBlockedUntil=Number(localStorage.getItem('apiBlockedUntil'))||0}catch(e){}
 
   var fmtTime=new Intl.DateTimeFormat('ru-RU',{timeZone:TZ,hour:'2-digit',minute:'2-digit',hour12:false});
   var fmtClock=new Intl.DateTimeFormat('ru-RU',{timeZone:TZ,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
@@ -164,7 +165,7 @@
     return fetch(API_URL,{cache:'no-cache',headers:{'Accept':'application/vnd.github+json'}}).then(function(r){
       if(!r.ok){
         var rem=r.headers.get('x-ratelimit-remaining'), reset=r.headers.get('x-ratelimit-reset');
-        if((r.status===403||r.status===429)&&(rem==='0'||!rem))apiBlockedUntil=reset?Number(reset)*1000:Date.now()+10*60*1000;
+        if((r.status===403||r.status===429)&&(rem==='0'||!rem)){apiBlockedUntil=reset?Number(reset)*1000:Date.now()+10*60*1000;try{localStorage.setItem('apiBlockedUntil',String(apiBlockedUntil))}catch(e){}}
         throw new Error('api '+r.status);
       }
       return r.json();
