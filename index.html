@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Uttara Jyotish — статус задач</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#2c4a6e; --accent-soft:#e8eef5; --text:#1d2939; --muted:#667085;
+    --line:#eaecf0; --bg:#f7f9fc; --card:#fff;
+    --run:#2c4a6e; --queue:#98a2b3; --wait:#c77d14; --wait-soft:#fdf4e6; --done:#23855a; --done-soft:#e9f6ef;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:Manrope,Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--text);background:var(--bg);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:var(--accent)}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+  header{display:flex;flex-direction:column;gap:12px;padding:8px 0 20px}
+  h1{font-size:1.5rem;line-height:1.25;margin:0;font-weight:800;letter-spacing:-.01em;color:var(--accent)}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--muted);font-size:.9rem;align-items:center}
+  .clock{font-variant-numeric:tabular-nums;font-weight:700;color:var(--text)}
+  .live{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-variant-numeric:tabular-nums}
+  .live .dot{color:var(--done);font-size:.8rem;animation:pulse 2s infinite}
+  .live.err .dot{color:#d92d20;animation:none}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+  .stat .num{font-size:1.75rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+  .stat .lbl{font-size:.85rem;color:var(--muted);margin-top:2px}
+  .stat.running .num{color:var(--run)} .stat.queued .num{color:var(--queue)}
+  .stat.waiting_user .num{color:var(--wait)} .stat.done .num{color:var(--done)}
+  .overall{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:28px}
+  .overall .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:10px;font-weight:600}
+  .overall .pct{font-size:1.25rem;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+  .bar{height:8px;background:var(--accent-soft);border-radius:999px;overflow:hidden}
+  .bar>span{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .6s ease}
+  .overall .bar{height:10px}
+  section.group{margin-bottom:28px}
+  .group h2{font-size:1.05rem;margin:0 0 12px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .group h2 .cnt{font-size:.8rem;font-weight:700;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:1px 9px}
+  .group h2 .sw{width:10px;height:10px;border-radius:50%;flex:none}
+  .cards{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0;box-shadow:0 1px 2px rgba(16,24,40,.03)}
+  .card h3{margin:0;font-size:1rem;font-weight:700;line-height:1.35;overflow-wrap:anywhere}
+  .card p{margin:0;color:var(--muted);font-size:.92rem;overflow-wrap:anywhere}
+  .card .badge{align-self:flex-start;font-size:.75rem;font-weight:700;border-radius:999px;padding:2px 10px;letter-spacing:.01em}
+  .card.running{border-left:4px solid var(--run)}
+  .card.queued{border-left:4px solid var(--queue)}
+  .card.waiting_user{border-left:4px solid var(--wait);background:linear-gradient(0deg,#fff,#fff) padding-box}
+  .card.done{border-left:4px solid var(--done)}
+  .badge.running{background:var(--accent-soft);color:var(--run)}
+  .badge.queued{background:#f2f4f7;color:#475467}
+  .badge.waiting_user{background:var(--wait-soft);color:var(--wait)}
+  .badge.done{background:var(--done-soft);color:var(--done)}
+  .todo{background:var(--wait-soft);border-radius:10px;padding:10px 12px;font-size:.92rem;color:#7a4b0c}
+  .todo b{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+  .prog{display:flex;align-items:center;gap:10px}
+  .prog .bar{flex:1}
+  .prog .p{font-size:.85rem;font-weight:700;min-width:3.2em;text-align:right;font-variant-numeric:tabular-nums}
+  .times{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.85rem;color:var(--muted)}
+  .times b{color:var(--text);font-weight:600}
+  .countdown{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--bg);border-radius:10px;padding:8px 12px;font-size:.88rem}
+  .countdown .t{font-variant-numeric:tabular-nums;font-weight:800;font-size:1.1rem;color:var(--accent);letter-spacing:.02em}
+  .countdown.late .t{font-size:.95rem;color:var(--wait)}
+  .result{font-weight:600;font-size:.9rem;text-decoration:none}
+  .result:hover{text-decoration:underline}
+  .empty{color:var(--muted);font-size:.92rem;padding:4px 0}
+  footer{color:var(--muted);font-size:.8rem;text-align:center;margin-top:24px}
+  .error{background:#fef3f2;color:#b42318;border:1px solid #fecdca;border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;display:none}
+  @media (min-width:640px){
+    .wrap{padding:32px 24px 56px}
+    h1{font-size:1.9rem}
+    .summary{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media (min-width:1024px){
+    header{flex-direction:row;justify-content:space-between;align-items:flex-end}
+    .meta{justify-content:flex-end}
+    .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Uttara Jyotish — статус задач</h1>
+      <div class="meta" style="justify-content:flex-start;margin-top:6px">
+        <span id="updated">Обновлено: —</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>Тбилиси, сейчас <span class="clock" id="clock">--:--:--</span></span>
+      <span class="live" id="live"><span class="dot">●</span> <span id="liveText">в реальном времени</span> · <span id="nextRefresh">обновление…</span></span>
+    </div>
+  </header>
+
+  <div class="error" id="error">Не удалось загрузить данные. Пробую снова…</div>
+
+  <div class="summary" id="summary"></div>
+  <div class="overall">
+    <div class="row"><span>Общий прогресс</span><span class="pct" id="overallPct">0%</span></div>
+    <div class="bar"><span id="overallBar" style="width:0%"></span></div>
+    <div class="times" style="margin-top:8px" id="overallText"></div>
+  </div>
+
+  <div id="groups"></div>
+  <footer>Страница обновляется автоматически каждые 30 секунд. Время указано по Тбилиси (UTC+4).</footer>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var OWNER='andreyastrolog-gif', REPO='status';
+  var API_URL='https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/status.json?ref=main';
+  var REFRESH_SEC=30, TZ='Asia/Tbilisi';
+  var ORDER=['running','waiting_user','queued','done'];
+  var LABELS={running:'Выполняется',queued:'В очереди',waiting_user:'Ждёт вашего ответа',done:'Готово'};
+  var STAT_LABELS={running:'выполняется',queued:'в очереди',waiting_user:'ждёт вашего ответа',done:'готово'};
+  var COLORS={running:'var(--run)',queued:'var(--queue)',waiting_user:'var(--wait)',done:'var(--done)'};
+
+  var data=null, lastRaw='', nextAt=0, apiBlockedUntil=0, loading=false;
+
+  var fmtTime=new Intl.DateTimeFormat('ru-RU',{timeZone:TZ,hour:'2-digit',minute:'2-digit',hour12:false});
+  var fmtClock=new Intl.DateTimeFormat('ru-RU',{timeZone:TZ,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  var fmtDay=new Intl.DateTimeFormat('ru-RU',{timeZone:TZ,day:'numeric',month:'long'});
+  var fmtKey=new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'});
+
+  function $(id){return document.getElementById(id)}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function parse(s){if(!s)return null;var d=new Date(s);return isNaN(d)?null:d}
+  function isToday(d){return fmtKey.format(d)===fmtKey.format(new Date())}
+  function when(d){return isToday(d)?fmtTime.format(d):fmtDay.format(d)+', '+fmtTime.format(d)}
+  function pad(n){return (n<10?'0':'')+n}
+  function hms(ms){var s=Math.max(0,Math.floor(ms/1000));return pad(Math.floor(s/3600))+':'+pad(Math.floor(s%3600/60))+':'+pad(s%60)}
+  function safeUrl(u){return /^https?:\/\//i.test(u||'')?u:null}
+  function clamp(v,a,b){return Math.min(b,Math.max(a,v))}
+
+  function taskPercent(t,now){
+    if(t.status==='done')return 100;
+    if(typeof t.progress==='number'&&isFinite(t.progress))return clamp(Math.round(t.progress),0,100);
+    if(t.status==='running'){
+      var s=parse(t.started), e=parse(t.eta);
+      if(s&&e&&e>s)return clamp(Math.round((now-s)/(e-s)*100),0,99);
+    }
+    return 0;
+  }
+
+  // ---------- data loading ----------
+  function decodeB64Utf8(b64){
+    var bin=atob(b64.replace(/\s/g,''));
+    var bytes=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+  function fromApi(){
+    if(Date.now()<apiBlockedUntil)return Promise.reject(new Error('api rate-limited'));
+    // cache:'no-cache' => browser revalidates with ETag; 304 responses don't count toward the rate limit
+    return fetch(API_URL,{cache:'no-cache',headers:{'Accept':'application/vnd.github+json'}}).then(function(r){
+      if(!r.ok){
+        var rem=r.headers.get('x-ratelimit-remaining'), reset=r.headers.get('x-ratelimit-reset');
+        if((r.status===403||r.status===429)&&(rem==='0'||!rem))apiBlockedUntil=reset?Number(reset)*1000:Date.now()+10*60*1000;
+        throw new Error('api '+r.status);
+      }
+      return r.json();
+    }).then(function(j){
+      if(!j||!j.content)throw new Error('api: no content');
+      return decodeB64Utf8(j.content);
+    });
+  }
+  function fromPages(){
+    return fetch('status.json?t='+Date.now(),{cache:'no-store'}).then(function(r){
+      if(!r.ok)throw new Error('pages '+r.status);
+      return r.text();
+    });
+  }
+  function load(){
+    if(loading)return;
+    loading=true;
+    fromApi().catch(function(){return fromPages()}).then(function(raw){
+      var d=JSON.parse(raw);
+      if(!d||!Array.isArray(d.tasks))throw new Error('bad data');
+      $('error').style.display='none';
+      $('live').classList.remove('err');$('liveText').textContent='в реальном времени';
+      if(raw!==lastRaw){lastRaw=raw;data=d;render();}
+    }).catch(function(e){
+      console.warn('status load failed',e);
+      $('live').classList.add('err');$('liveText').textContent='нет связи';
+      if(!data)$('error').style.display='block';
+    }).then(function(){loading=false;nextAt=Date.now()+REFRESH_SEC*1000;});
+  }
+
+  // ---------- rendering ----------
+  function card(t){
+    var st=ORDER.indexOf(t.status)>=0?t.status:'queued';
+    var s=parse(t.started), e=parse(t.eta), f=parse(t.finished), link=safeUrl(t.link);
+    var h='<article class="card '+st+'" data-id="'+esc(t.id)+'">';
+    h+='<span class="badge '+st+'">'+LABELS[st]+'</span>';
+    h+='<h3>'+esc(t.title)+'</h3>';
+    if(st==='waiting_user'){
+      h+='<div class="todo"><b>Что нужно от вас</b>'+esc(t.description||t.title)+'</div>';
+    }else if(t.description){
+      h+='<p>'+esc(t.description)+'</p>';
+    }
+    if(st!=='waiting_user'){
+      var pct=taskPercent(t,new Date());
+      h+='<div class="prog"><div class="bar"><span data-bar style="width:'+pct+'%"></span></div><span class="p" data-pct>'+pct+'%</span></div>';
+    }
+    var times=[];
+    if(s)times.push('Начало: <b>'+when(s)+'</b>');
+    if(st==='done'&&f)times.push('Готово в <b>'+when(f)+'</b>');
+    if(st!=='done'&&e)times.push('будет готово примерно в <b>'+when(e)+'</b>');
+    if(times.length)h+='<div class="times">'+times.map(function(x){return '<span>'+x+'</span>'}).join('')+'</div>';
+    if(st!=='done'&&e){
+      h+='<div class="countdown" data-eta="'+e.getTime()+'"><span data-cdl>Осталось</span><span class="t" data-cd>--:--:--</span></div>';
+    }
+    if(st==='done'&&link)h+='<a class="result" href="'+esc(link)+'" target="_blank" rel="noopener">Открыть результат →</a>';
+    h+='</article>';
+    return h;
+  }
+
+  function render(){
+    var tasks=data.tasks||[], counts={running:0,queued:0,waiting_user:0,done:0};
+    tasks.forEach(function(t){if(counts[t.status]!=null)counts[t.status]++;else counts.queued++;});
+    var u=parse(data.updated);
+    $('updated').textContent='Обновлено: '+(u?fmtDay.format(u)+', '+fmtTime.format(u):'—');
+    $('summary').innerHTML=ORDER.map(function(k){
+      return '<div class="stat '+k+'"><div class="num">'+counts[k]+'</div><div class="lbl">'+STAT_LABELS[k]+'</div></div>';
+    }).join('');
+    var total=tasks.length, pct=total?Math.round(counts.done/total*100):0;
+    $('overallPct').textContent=pct+'%';
+    $('overallBar').style.width=pct+'%';
+    $('overallText').innerHTML='<span>Готово <b>'+counts.done+'</b> из <b>'+total+'</b> задач</span>';
+    $('groups').innerHTML=ORDER.map(function(k){
+      var list=tasks.filter(function(t){return (ORDER.indexOf(t.status)>=0?t.status:'queued')===k});
+      if(!list.length)return '';
+      if(k==='done')list.sort(function(a,b){return (parse(b.finished)||0)-(parse(a.finished)||0)});
+      return '<section class="group"><h2><span class="sw" style="background:'+COLORS[k]+'"></span>'+LABELS[k]+' <span class="cnt">'+list.length+'</span></h2><div class="cards">'+list.map(card).join('')+'</div></section>';
+    }).join('');
+    tick();
+  }
+
+  function tick(){
+    var now=new Date();
+    $('clock').textContent=fmtClock.format(now);
+    var left=Math.max(0,Math.ceil((nextAt-Date.now())/1000));
+    $('nextRefresh').textContent=loading||!nextAt?'обновление…':'обновление через '+left+' с';
+    if(!data)return;
+    var byId={};(data.tasks||[]).forEach(function(t){byId[t.id]=t});
+    var cards=document.querySelectorAll('.card');
+    for(var i=0;i<cards.length;i++){
+      var el=cards[i], t=byId[el.getAttribute('data-id')];
+      if(!t)continue;
+      var bar=el.querySelector('[data-bar]');
+      if(bar&&t.status==='running'){var p=taskPercent(t,now);bar.style.width=p+'%';el.querySelector('[data-pct]').textContent=p+'%';}
+      var cd=el.querySelector('.countdown');
+      if(cd){
+        var ms=Number(cd.getAttribute('data-eta'))-now.getTime();
+        if(ms>0){cd.classList.remove('late');cd.querySelector('[data-cdl]').textContent='Осталось';cd.querySelector('[data-cd]').textContent=hms(ms);}
+        else{cd.classList.add('late');cd.querySelector('[data-cdl]').textContent='Статус';cd.querySelector('[data-cd]').textContent='уже скоро, заканчиваю';}
+      }
+    }
+    if(nextAt&&Date.now()>=nextAt&&!loading)load();
+  }
+
+  load();
+  setInterval(tick,1000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)load()});
+})();
+</script>
+</body>
+</html>
